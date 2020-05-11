@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package cacheService;
+
+import "google/protobuf/empty.proto";
+
+// Item is what is stored in the cache
+message Item {
+  string key = 1;
+  string value = 2;
+  string expiration = 3;
+}
+
+message GetKey {
+    string key = 1;
+}
+
+message AllItems {
+  repeated Item items = 1;
+}
+
+message Success {
+  bool success = 1;
+}
+
+service CacheService {
+    rpc Add (Item) returns (Item);
+    rpc Get (GetKey) returns (Item);
+    rpc GetAllItems(google.protobuf.Empty) returns (AllItems);
+    rpc DeleteKey(GetKey) returns (Success);
+    rpc DeleteAll(google.protobuf.Empty) returns (Success);
+}
+

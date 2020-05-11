@@ -1,0 +1,4 @@
+.DS_Store
+.env
+server-cache
+client-cache
