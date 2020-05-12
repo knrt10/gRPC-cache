@@ -1,4 +1,4 @@
-package v1
+package server
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc/test/bufconn"
 
 	"github.com/golang/protobuf/ptypes/empty"
-	apis "github.com/knrt10/percona-cache/pkg/api/v1"
+	apis "github.com/knrt10/percona-cache/proto"
 )
 
 const (
@@ -36,17 +36,6 @@ func init() {
 
 func bufDialer(context.Context, string) (net.Conn, error) {
 	return lis.Dial()
-}
-
-func connectClient() (apis.CacheServiceClient, error) {
-	ctx := context.Background()
-	conn, err := grpc.DialContext(ctx, "bufnet", grpc.WithContextDialer(bufDialer), grpc.WithInsecure())
-	if err != nil {
-		return nil, err
-	}
-	defer conn.Close()
-	c := apis.NewCacheServiceClient(conn)
-	return c, nil
 }
 
 func TestAdd(t *testing.T) {
@@ -98,9 +87,10 @@ func TestAdd(t *testing.T) {
 			resp.Key, "knrt10")
 	}
 
-	// Save 900000 keys
-	for i := 0; i < 40000; i++ {
-		c.Add(context.Background(), &apis.Item{
+	// Save keys
+	// Checking for race condition
+	for i := 0; i < 100; i++ {
+		go c.Add(context.Background(), &apis.Item{
 			Key:        strconv.Itoa(i),
 			Value:      "Value of i is ",
 			Expiration: strconv.Itoa(i),
@@ -144,14 +134,9 @@ func TestGetAllItems(t *testing.T) {
 	defer conn.Close()
 	c := apis.NewCacheServiceClient(conn)
 
-	resp, err := c.GetAllItems(context.Background(), &empty.Empty{})
+	_, err = c.GetAllItems(context.Background(), &empty.Empty{})
 	if err != nil {
 		t.Fatalf("Adding key Failed: %v", err)
-	}
-
-	if len(resp.Items) != 40002 {
-		t.Errorf("handler returned unexpected body: got %v want %v",
-			len(resp.Items), 40002)
 	}
 }
 

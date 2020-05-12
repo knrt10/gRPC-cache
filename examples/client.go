@@ -5,11 +5,12 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"strconv"
 
 	"google.golang.org/grpc"
 
 	"github.com/golang/protobuf/ptypes/empty"
-	api "github.com/knrt10/percona-cache/pkg/api/v1"
+	api "github.com/knrt10/percona-cache/proto"
 )
 
 var (
@@ -59,6 +60,15 @@ func main() {
 	}
 	fmt.Println("Response from server for adding a key", addKeyRes)
 
+	// Checking for race condition
+	for i := 0; i < 50; i++ {
+		go c.Add(context.Background(), &api.Item{
+			Key:        strconv.Itoa(i),
+			Value:      "Value of i is ",
+			Expiration: strconv.Itoa(i),
+		})
+	}
+
 	// Get key
 	keyGet := &api.GetKey{
 		Key: "2006",
@@ -92,9 +102,8 @@ func main() {
 	fmt.Println("Response from server after deleting all keys", deleteAllKeysResp)
 
 	// GetAllItems after deleting key
-	getAllKeysRes, err = c.GetAllItems(context.Background(), &empty.Empty{})
+	_, err = c.GetAllItems(context.Background(), &empty.Empty{})
 	if err != nil {
-		log.Fatalf("Error when calling GetAllItems: %s", err)
+		fmt.Println("Response from server after no key found", err.Error())
 	}
-	fmt.Println("Response from server for getting all keys after deleting all keys", getAllKeysRes)
 }

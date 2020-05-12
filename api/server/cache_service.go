@@ -1,9 +1,34 @@
-package v1
+package server
 
 import (
 	"runtime"
+	"sync"
 	"time"
 )
+
+// Item items value of key and expiration
+type Item struct {
+	Object     interface{}
+	Expiration int64
+}
+
+// Cache is a struct in which the cache's methods synchronize access to this map, so it is not
+// recommended to keep any references to the map around after creating a cache.
+type Cache struct {
+	*cache
+}
+
+type worker struct {
+	Interval time.Duration
+	stop     chan bool
+}
+
+type cache struct {
+	defaultExpiration time.Duration
+	mu                sync.RWMutex
+	items             map[interface{}]interface{}
+	worker            *worker
+}
 
 // NewCacheService is used to initialize a new cache.
 // Return a new cache with a given default expiration duration and cleanup
@@ -21,20 +46,20 @@ func NewCacheService(defaultExpiration, cleanupInterval time.Duration) *Cache {
 // the returned C object from being garbage collected. When it is
 // garbage collected, the finalizer stops the Worker goroutine, after
 // which c can be collected.
-func newCacheWithWorker(de time.Duration, ci time.Duration, m map[interface{}]interface{}) *Cache {
-	c := newCache(de, m)
+func newCacheWithWorker(defaultExpiration time.Duration, cleanupInterval time.Duration, items map[interface{}]interface{}) *Cache {
+	c := newCache(defaultExpiration, items)
 	C := &Cache{c}
-	if ci > 0 {
-		runWorker(c, ci)
+	if cleanupInterval > 0 {
+		runWorker(c, cleanupInterval)
 		runtime.SetFinalizer(C, stopWorker)
 	}
 	return C
 }
 
-func newCache(de time.Duration, m map[interface{}]interface{}) *cache {
+func newCache(defaultExpiration time.Duration, items map[interface{}]interface{}) *cache {
 	c := &cache{
-		defaultExpiration: de,
-		store:             m,
+		defaultExpiration: defaultExpiration,
+		items:             items,
 	}
 	return c
 }
@@ -44,25 +69,25 @@ func stopWorker(c *Cache) {
 	c.worker.stop <- true
 }
 
-func runWorker(c *cache, ci time.Duration) {
-	j := &worker{
-		Interval: ci,
+func runWorker(c *cache, cleanupInterval time.Duration) {
+	w := &worker{
+		Interval: cleanupInterval,
 		stop:     make(chan bool),
 	}
-	c.worker = j
+	c.worker = w
 	// This starts the new ticker and checks for expiration keys in cache
-	go j.Run(c)
+	go w.Run(c)
 }
 
 // Run deletes keys that get expired
-func (j *worker) Run(c *cache) {
-	ticker := time.NewTicker(j.Interval)
+func (w *worker) Run(c *cache) {
+	ticker := time.NewTicker(w.Interval)
 	for {
 		select {
 		case <-ticker.C:
 			// This means key has expired
 			c.deleteExpired()
-		case <-j.stop:
+		case <-w.stop:
 			ticker.Stop()
 			return
 		}
@@ -71,7 +96,7 @@ func (j *worker) Run(c *cache) {
 
 // delete is used to delete key from the cache
 func (c *cache) delete(k interface{}) (interface{}, bool) {
-	delete(c.store, k)
+	delete(c.items, k)
 	return nil, false
 }
 
@@ -79,7 +104,7 @@ func (c *cache) delete(k interface{}) (interface{}, bool) {
 func (c *cache) deleteExpired() {
 	now := time.Now().UnixNano()
 	c.mu.Lock()
-	for k, v := range c.store {
+	for k, v := range c.items {
 		if v.(Item).Expiration > 0 && now > v.(Item).Expiration {
 			c.delete(k)
 		}

@@ -7,8 +7,8 @@ import (
 	"net"
 	"time"
 
-	api "github.com/knrt10/percona-cache/pkg/api/v1"
-	cache "github.com/knrt10/percona-cache/pkg/server/v1"
+	cache "github.com/knrt10/percona-cache/api/server"
+	api "github.com/knrt10/percona-cache/proto"
 	"google.golang.org/grpc"
 )
 

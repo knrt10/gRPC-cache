@@ -1,2 +1,2 @@
 #!/bin/bash
-go build -o server-cache pkg/server/main.go && go build -o client-cache pkg/client/client.go
+go build -o server-cache api/main.go && go build -o client-cache examples/client.go

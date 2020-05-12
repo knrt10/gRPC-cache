@@ -1,25 +1,25 @@
-package v1
+package server
 
 import (
 	"context"
 	"time"
 
 	"github.com/golang/protobuf/ptypes/empty"
-	api "github.com/knrt10/percona-cache/pkg/api/v1"
+	api "github.com/knrt10/percona-cache/proto"
 )
 
 // Add is used to add key/value pair to the cache.
 func (c *cache) Add(ctx context.Context, item *api.Item) (*api.Item, error) {
-	var e int64
-	d, _ := time.ParseDuration(item.Expiration)
+	var expiration int64
+	duration, _ := time.ParseDuration(item.Expiration)
 	// Meaning d is of form "2m30s"
-	if d > 0 {
-		e = time.Now().Add(d).UnixNano()
+	if duration > 0 {
+		expiration = time.Now().Add(duration).UnixNano()
 	}
 	c.mu.Lock()
-	c.store[item.Key] = Item{
+	c.items[item.Key] = Item{
 		Object:     item.Value,
-		Expiration: e,
+		Expiration: expiration,
 	}
 	c.mu.Unlock()
 	return item, nil
@@ -30,7 +30,7 @@ func (c *cache) Get(ctx context.Context, args *api.GetKey) (*api.Item, error) {
 	key := args.Key
 	// Locking so that other goroutines cannot access this at the same time
 	c.mu.RLock()
-	value, exists := c.store[key]
+	value, exists := c.items[key]
 	// No key found
 	if !exists {
 		c.mu.RUnlock()
@@ -56,16 +56,16 @@ func (c *cache) Get(ctx context.Context, args *api.GetKey) (*api.Item, error) {
 func (c *cache) GetAllItems(ctx context.Context, in *empty.Empty) (*api.AllItems, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	var m []*api.Item
+	var items []*api.Item
 	now := time.Now().UnixNano()
-	for k, v := range c.store {
+	for k, v := range c.items {
 		if v.(Item).Expiration > 0 {
 			if now > v.(Item).Expiration {
 				continue
 			}
 		}
 
-		m = append(m, &api.Item{
+		items = append(items, &api.Item{
 			Key:        k.(string),
 			Value:      v.(Item).Object.(string),
 			Expiration: time.Unix(0, v.(Item).Expiration).String(),
@@ -73,12 +73,12 @@ func (c *cache) GetAllItems(ctx context.Context, in *empty.Empty) (*api.AllItems
 	}
 
 	// This means no keys were found, or all were expired
-	if len(m) < 1 {
+	if len(items) < 1 {
 		return nil, ErrNoKey
 	}
 
 	return &api.AllItems{
-		Items: m,
+		Items: items,
 	}, nil
 }
 
@@ -95,7 +95,7 @@ func (c *cache) DeleteKey(ctx context.Context, args *api.GetKey) (*api.Success, 
 // Delete all items from the cache.
 func (c *cache) DeleteAll(ctx context.Context, in *empty.Empty) (*api.Success, error) {
 	c.mu.Lock()
-	c.store = map[interface{}]interface{}{}
+	c.items = map[interface{}]interface{}{}
 	c.mu.Unlock()
 	return &api.Success{
 		Success: true,
