@@ -5,6 +5,7 @@
 > In memory cache, using gRPC
 
 [![Build Status](https://travis-ci.org/knrt10/gRPC-cache.svg?branch=master)](https://travis-ci.org/knrt10/gRPC-cache)
+[![Coverage Status](https://coveralls.io/repos/github/knrt10/gRPC-cache/badge.svg)](https://coveralls.io/github/knrt10/gRPC-cache)
 [![Documentation](https://img.shields.io/badge/godoc-reference-blue.svg)](https://godoc.org/github.com/knrt10/gRPC-cache/api/server)
 
 ## Contents
@@ -57,9 +58,9 @@ Usage of ./server-cache:
   -addr string
       Address on which you want to run server (default ":5001")
   -cln int
-    	Cleanup interval duration of expired cache is 5 min (default 5)
+      Cleanup interval duration of expired cache is 5 min (default 5)
   -exp int
-    	Default expiration duration of cache is 10 min (default 10)
+      Default expiration duration of cache is 10 min (default 10)
 
 # To use client
 $ ./client-cache --help
@@ -133,27 +134,29 @@ func (c Cache) DeleteAll(ctx context.Context, in *empty.Empty) (*api.Success, er
 
 ## Testing
 
-After running `make build` just run `make test` to run the tests. It has **coverage of 80.9%**
+After running `make build` just run `make test` to run the tests. It has **coverage of 91.2%**
 
 ```bash
-go test pkg/server/v1/* -v -cover -race
+go test api/server/* -v -cover -race
 === RUN   TestAdd
---- PASS: TestAdd (3.97s)
+--- PASS: TestAdd (0.04s)
 === RUN   TestGet
---- PASS: TestGet (0.00s)
+--- PASS: TestGet (0.03s)
 === RUN   TestGetAllItems
---- PASS: TestGetAllItems (0.15s)
+--- PASS: TestGetAllItems (0.01s)
 === RUN   TestDeleteKey
---- PASS: TestDeleteKey (0.00s)
+--- PASS: TestDeleteKey (0.01s)
 === RUN   TestDeleteAll
 --- PASS: TestDeleteAll (0.01s)
 === RUN   TestGetDeletedKey
---- PASS: TestGetDeletedKey (0.00s)
+--- PASS: TestGetDeletedKey (0.01s)
+=== RUN   TestDeleteKeyByExpiration
+--- PASS: TestDeleteKeyByExpiration (2.01s)
 PASS
-coverage: 80.9% of statements
-ok  	command-line-arguments	5.289s	coverage: 80.9% of statements
+coverage: 91.2% of statements
+ok  	command-line-arguments	3.617s	coverage: 91.2% of statements
 ```
 
-## Example 
+## Example
 
 Please refer to [examples](https://github.com/knrt10/gRPC-cache/tree/master/examples) directory for more information

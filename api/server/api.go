@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/ptypes/empty"
-	api "github.com/knrt10/percona-cache/proto"
+	api "github.com/knrt10/grpc-cache/proto"
 )
 
 // Add is used to add key/value pair to the cache.

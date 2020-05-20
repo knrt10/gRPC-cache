@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/golang/protobuf/ptypes/empty"
-	api "github.com/knrt10/percona-cache/proto"
+	api "github.com/knrt10/grpc-cache/proto"
 )
 
 var (
