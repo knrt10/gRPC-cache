@@ -53,8 +53,8 @@ func TestAdd(t *testing.T) {
 	}
 
 	keyVal2 := &apis.Item{
-		Key:        "2006",
-		Value:      "percona",
+		Key:        "24",
+		Value:      "palash",
 		Expiration: "1m",
 	}
 

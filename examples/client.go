@@ -40,8 +40,8 @@ func main() {
 	}
 
 	keyVal2 := &api.Item{
-		Key:        "2006",
-		Value:      "percona",
+		Key:        "distributed",
+		Value:      "systems",
 		Expiration: "20s",
 	}
 
@@ -71,7 +71,7 @@ func main() {
 
 	// Get key
 	keyGet := &api.GetKey{
-		Key: "2006",
+		Key: "distributed",
 	}
 
 	getKeyRes, err := c.Get(context.Background(), keyGet)

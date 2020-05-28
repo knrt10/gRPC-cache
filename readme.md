@@ -6,6 +6,7 @@
 
 [![Build Status](https://travis-ci.org/knrt10/gRPC-cache.svg?branch=master)](https://travis-ci.org/knrt10/gRPC-cache)
 [![Coverage Status](https://coveralls.io/repos/github/knrt10/gRPC-cache/badge.svg)](https://coveralls.io/github/knrt10/gRPC-cache)
+[![Go Report Card](https://goreportcard.com/badge/github.com/knrt10/grpc-Cache)](https://goreportcard.com/report/github.com/knrt10/grpc-Cache)
 [![Documentation](https://img.shields.io/badge/godoc-reference-blue.svg)](https://godoc.org/github.com/knrt10/gRPC-cache/api/server)
 
 ## Contents
