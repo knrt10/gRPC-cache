@@ -51,8 +51,29 @@ func main() {
 		Expiration: "2min10s",
 	}
 
+	keyVal4 := &api.Item{
+		Key:        "prefixTest",
+		Value:      "val1",
+		Expiration: "10s",
+	}
+
+	keyVal5 := &api.Item{
+		Key:        "prefixTest1",
+		Value:      "val2",
+		Expiration: "10s",
+	}
+
+	keyVal6 := &api.Item{
+		Key:        "prefixTest2",
+		Value:      "val3",
+		Expiration: "10s",
+	}
+
 	c.Add(context.Background(), keyVal1)
 	c.Add(context.Background(), keyVal2)
+	c.Add(context.Background(), keyVal4)
+	c.Add(context.Background(), keyVal5)
+	c.Add(context.Background(), keyVal6)
 
 	addKeyRes, err := c.Add(context.Background(), keyVal3)
 	if err != nil {
@@ -79,6 +100,17 @@ func main() {
 		log.Fatalf("Error when calling Get: %s", err)
 	}
 	fmt.Println("Response from server for getting a key", getKeyRes)
+
+	// Get keys by prefix
+	keyGetPrefix := &api.GetKey{
+		Key: "prefixTest",
+	}
+
+	getKeyPrefixRes, err := c.GetByPrefix(context.Background(), keyGetPrefix)
+	if err != nil {
+		log.Fatalf("Error when calling Get: %s", err)
+	}
+	fmt.Println("Response from server for getting a keys by prefix", getKeyPrefixRes)
 
 	// GetAllItems
 	getAllKeysRes, err := c.GetAllItems(context.Background(), &empty.Empty{})

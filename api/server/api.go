@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/golang/protobuf/ptypes/empty"
@@ -49,6 +50,38 @@ func (c *cache) Get(ctx context.Context, args *api.GetKey) (*api.Item, error) {
 		Key:        key,
 		Value:      value.(Item).Object.(string),
 		Expiration: time.Unix(0, value.(Item).Expiration).String(),
+	}, nil
+}
+
+// GetByPrefix method is all keys that match the prefix while providing key as args
+func (c *cache) GetByPrefix(ctx context.Context, args *api.GetKey) (*api.AllItems, error) {
+	key := args.Key
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	var items []*api.Item
+	now := time.Now().UnixNano()
+	for k, v := range c.items {
+		if v.(Item).Expiration > 0 {
+			if now > v.(Item).Expiration {
+				continue
+			}
+		}
+
+		if strings.Contains(k.(string), key) {
+			items = append(items, &api.Item{
+				Key:        k.(string),
+				Value:      v.(Item).Object.(string),
+				Expiration: time.Unix(0, v.(Item).Expiration).String(),
+			})
+		}
+	}
+	// This means no keys were found, or all were expired
+	if len(items) < 1 {
+		return nil, ErrNoKey
+	}
+
+	return &api.AllItems{
+		Items: items,
 	}, nil
 }
 

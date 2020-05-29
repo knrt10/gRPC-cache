@@ -26,6 +26,7 @@ message Success {
 service CacheService {
     rpc Add (Item) returns (Item);
     rpc Get (GetKey) returns (Item);
+    rpc GetByPrefix(GetKey) returns (AllItems);
     rpc GetAllItems(google.protobuf.Empty) returns (AllItems);
     rpc DeleteKey(GetKey) returns (Success);
     rpc DeleteAll(google.protobuf.Empty) returns (Success);

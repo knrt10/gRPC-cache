@@ -113,7 +113,7 @@ func TestGet(t *testing.T) {
 	}
 	resp, err := c.Get(context.Background(), keyGet)
 	if err != nil {
-		t.Fatalf("Adding key Failed: %v", err)
+		t.Fatalf("Getting key Failed: %v", err)
 	}
 	if resp.Key != "kautilya" {
 		t.Errorf("handler returned unexpected body: got %v want %v",
@@ -122,6 +122,59 @@ func TestGet(t *testing.T) {
 	if resp.Value != "knrt10" {
 		t.Errorf("handler returned unexpected body: got %v want %v",
 			resp.Key, "knrt10")
+	}
+}
+
+func TestGetByPrefix(t *testing.T) {
+	ctx := context.Background()
+	conn, err := grpc.DialContext(ctx, "bufnet", grpc.WithContextDialer(bufDialer), grpc.WithInsecure())
+	if err != nil {
+		t.Fatalf("Failed to dial bufnet: %v", err)
+	}
+	defer conn.Close()
+	c := apis.NewCacheServiceClient(conn)
+
+	keyVal1 := &apis.Item{
+		Key:        "prefixTest",
+		Value:      "val1",
+		Expiration: "10s",
+	}
+
+	keyVal2 := &apis.Item{
+		Key:        "prefixTest1",
+		Value:      "val2",
+		Expiration: "10s",
+	}
+
+	keyVal3 := &apis.Item{
+		Key:        "prefixTest2",
+		Value:      "val3",
+		Expiration: "10s",
+	}
+
+	c.Add(context.Background(), keyVal1)
+	c.Add(context.Background(), keyVal2)
+	c.Add(context.Background(), keyVal3)
+
+	keyWrongPrefix := &apis.GetKey{
+		Key: "wrongPrefix",
+	}
+	_, err = c.GetByPrefix(context.Background(), keyWrongPrefix)
+	if err.Error() != "rpc error: code = Unknown desc = No key found" {
+		t.Errorf("No key found")
+	}
+
+	keyRightPrefix := &apis.GetKey{
+		Key: "prefixTest",
+	}
+
+	resp, err := c.GetByPrefix(context.Background(), keyRightPrefix)
+	if err != nil {
+		t.Fatalf("Getting key by prefix Failed: %v", err)
+	}
+	if len(resp.Items) != 3 {
+		t.Errorf("handler returned unexpected body: got %v want %v",
+			len(resp.Items), 3)
 	}
 }
 
@@ -136,7 +189,7 @@ func TestGetAllItems(t *testing.T) {
 
 	_, err = c.GetAllItems(context.Background(), &empty.Empty{})
 	if err != nil {
-		t.Fatalf("Adding key Failed: %v", err)
+		t.Fatalf("Getting all keys Failed: %v", err)
 	}
 }
 
@@ -154,7 +207,7 @@ func TestDeleteKey(t *testing.T) {
 	}
 	resp, err := c.DeleteKey(context.Background(), keyGet)
 	if err != nil {
-		t.Fatalf("Adding key Failed: %v", err)
+		t.Fatalf("Deleting key Failed: %v", err)
 	}
 	if resp.Success != true {
 		t.Errorf("handler returned unexpected body: got %v want %v",
@@ -173,7 +226,7 @@ func TestDeleteAll(t *testing.T) {
 
 	resp, err := c.DeleteAll(context.Background(), &empty.Empty{})
 	if err != nil {
-		t.Fatalf("Adding key Failed: %v", err)
+		t.Fatalf("Deleting key Failed: %v", err)
 	}
 	if resp.Success != true {
 		t.Errorf("handler returned unexpected body: got %v want %v",

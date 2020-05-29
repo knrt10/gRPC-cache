@@ -20,6 +20,7 @@
 - [API](#api)
     - [Add](#add)
     - [Get](#get)
+    - [GetByPrefix](#getByPrefix)
     - [GetAllItems](#getallitems)
     - [DeleteKey](#deletekey)
     - [DeleteAll](#deleteall)
@@ -109,6 +110,14 @@ This is used to get key value pair for a particular key
 func (c Cache) Get(ctx context.Context, args *api.GetKey) (*api.Item, error)
 ```
 
+### GetByPrefix
+
+Used to get all key value pairs by prefix
+
+```go
+func (c Cache) GetByPrefix(ctx context.Context, args *api.GetKey) (*api.AllItems, error)
+```
+
 ### GetAllItems
 
 Used to get all key value pairs
@@ -135,27 +144,29 @@ func (c Cache) DeleteAll(ctx context.Context, in *empty.Empty) (*api.Success, er
 
 ## Testing
 
-After running `make build` just run `make test` to run the tests. It has **coverage of 91.2%**
+After running `make build` just run `make test` to run the tests. It has **coverage of 92.7%**
 
 ```bash
 go test api/server/* -v -cover -race
 === RUN   TestAdd
---- PASS: TestAdd (0.04s)
+--- PASS: TestAdd (0.03s)
 === RUN   TestGet
---- PASS: TestGet (0.03s)
+--- PASS: TestGet (0.01s)
+=== RUN   TestGetByPrefix
+--- PASS: TestGetByPrefix (0.01s)
 === RUN   TestGetAllItems
 --- PASS: TestGetAllItems (0.01s)
 === RUN   TestDeleteKey
---- PASS: TestDeleteKey (0.01s)
+--- PASS: TestDeleteKey (0.00s)
 === RUN   TestDeleteAll
---- PASS: TestDeleteAll (0.01s)
+--- PASS: TestDeleteAll (0.00s)
 === RUN   TestGetDeletedKey
 --- PASS: TestGetDeletedKey (0.01s)
 === RUN   TestDeleteKeyByExpiration
 --- PASS: TestDeleteKeyByExpiration (2.01s)
 PASS
-coverage: 91.2% of statements
-ok  	command-line-arguments	3.617s	coverage: 91.2% of statements
+coverage: 92.7% of statements
+ok  	command-line-arguments	3.709s	coverage: 92.7% of statements
 ```
 
 ## Example
