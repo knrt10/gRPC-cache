@@ -20,3 +20,11 @@ client:
 
 test:
 	- go test api/server/* -v -cover -race
+
+create-k8resources:
+	- chmod 777 scripts/create-k8resources.sh
+	- scripts/create-k8resources.sh $(hostPort) $(containerPort)
+
+run-kubernetes:
+	- chmod 777 scripts/run-kubernetes.sh
+	- scripts/run-kubernetes.sh $(hostPort) $(containerPort)

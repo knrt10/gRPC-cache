@@ -17,6 +17,7 @@
 - [Usage](#usage)
     - [Local](#local)
     - [Docker](#docker)
+    - [Kubernetes](#kubernetes)
 - [API](#api)
     - [Add](#add)
     - [Get](#get)
@@ -43,7 +44,8 @@ Go in memory cache using gRPC to generate API. Functionalities include
 - [Golang min-version(1.11)](https://golang.org/)
 - make
 - [protobuf](https://github.com/golang/protobuf)
-
+- [minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 
 ## Getting Started
 
@@ -89,6 +91,18 @@ You can run server in 2 ways either using local setup or docker.
 After running the server, start your client `./client-cache` or `make client` in a different terminal
 
 - `./client-cache -addr=":5001"` is server is running running on port `5001`
+
+### Kubernetes
+
+You can run server on your kubernetes cluster. For both the commands below you can pass 2 parameters `hostPort` and `containerPort` both of which are optional. Default for both is `5001`. All the resources are created on `grpc-cache` namespace. Before running the command below make sure your cluster is up and running.
+
+- Run this command `make create-k8resources` or `make create-k8resources hostPort=2000 containerPort=5001`
+
+After the above command if you have passed `hostPort` and `containerPort` as parameter then provide the same parameter in command below. Also wait for pod to create and run. Once the pod is running on `grpc-cache` namespace run the below command
+
+- `make run-kubernetes` or `make run-kubernetes hostPort=2000 containerPort=5001`
+
+This will forward the TCP connection to `hostPort` where your client can listen connection to
 
 ## API
 
