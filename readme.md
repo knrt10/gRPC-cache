@@ -44,8 +44,10 @@ Go in memory cache using gRPC to generate API. Functionalities include
 - [Golang min-version(1.11)](https://golang.org/)
 - make
 - [protobuf](https://github.com/golang/protobuf)
-- [minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/)
-- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+- [minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/) installed locally
+- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) installed locally
+- [helm](https://helm.sh/) installed locally
+- [grpcurl](https://github.com/fullstorydev/grpcurl) for testing server running on k8s
 
 ## Getting Started
 
@@ -94,15 +96,43 @@ After running the server, start your client `./client-cache` or `make client` in
 
 ### Kubernetes
 
-You can run server on your kubernetes cluster. For both the commands below you can pass 2 parameters `hostPort` and `containerPort` both of which are optional. Default for both is `5001`. All the resources are created on `grpc-cache` namespace. Before running the command below make sure your cluster is up and running.
+You can run server on your kubernetes cluster. All the resources are created on `grpc-cache` namespace. Before running the command below make sure your cluster is up and running.
 
-- Run this command `make create-k8resources` or `make create-k8resources hostPort=2000 containerPort=5001`
+- Run this command `make run-k8s-server`
 
-After the above command if you have passed `hostPort` and `containerPort` as parameter then provide the same parameter in command below. Also wait for pod to create and run. Once the pod is running on `grpc-cache` namespace run the below command
+This will create all the required resources needed to run your grpc server. Make sure all resources are ready before running the below command to get your IP for ingress.
 
-- `make run-kubernetes` or `make run-kubernetes hostPort=2000 containerPort=5001`
+`kubectl get ingress grpc-cache -o jsonpath='{.status.loadBalancer.ingress[0].ip}'`
+> 192.168.64.3
 
-This will forward the TCP connection to `hostPort` where your client can listen connection to
+You will have a diffrent output. You need this to add to your `/etc/hosts`. Add the above IP to your `/etc/hosts` to map to your ingress host.
+
+`192.168.64.3 grpc-cache.example.com`
+> 192.168.64.3 will be different for you.
+
+Now you can easily test it using [grpcurl](https://github.com/fullstorydev/grpcurl).
+
+#### Example
+
+```bash
+# To list all services exposed by a server, use the "list" verb.
+grpcurl --insecure grpc-cache.example.com:443 list
+
+# The "describe" verb will print the type of any symbol that the server knows about or that is found in a given protoset file. It also prints a description of that symbol, in the form of snippets of proto source. It won't necessarily be the original source that defined the element, but it will be equivalent.
+
+grpcurl --insecure grpc-cache.example.com:443 list cacheService.CacheService
+
+# To add a key
+grpcurl --insecure -d '{"key": "knrt10", "value": "pro", "expiration": "3m"}' grpc-cache.example.com:443 cacheService.CacheService/Add
+
+# To get key
+grpcurl --insecure -d '{"key": "knrt10"}' grpc-cache.example.com:443 cacheService.CacheService/Get
+
+# To get all keys
+grpcurl --insecure grpc-cache.example.com:443 cacheService.CacheService/GetAllItems
+```
+
+Similarly you can use all the methods as shown in API below
 
 ## API
 

@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc-cache
+  namespace: grpc-cache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: grpc-cache
+  template:
+    metadata:
+      labels:
+        name: grpc-cache
+      namespace: grpc-cache
+    spec:
+      containers:
+        - name: grpc-cache
+          image: knrt10/grpc-cache
+          ports:
+          - containerPort: 5001
+            name: grpc
+
+

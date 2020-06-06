@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: grpc-cache
+  namespace: grpc-cache
+  annotations:
+    "kubernetes.io/ingress.class": "nginx"
+    "nginx.ingress.kubernetes.io/backend-protocol": "GRPC"
+    "nginx.ingress.kubernetes.io/ssl-redirect": "true"
+spec:
+  rules:
+    - host: grpc-cache.example.com
+      http:
+        paths:
+          - backend:
+              serviceName: grpc-cache
+              servicePort: grpc
+  tls:
+  - secretName: grpc-cache.example.com
+    hosts:
+      - grpc-cache.example.com

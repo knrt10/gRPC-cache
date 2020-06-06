@@ -22,7 +22,7 @@ var (
 func main() {
 
 	// Get address from flag
-	flag.StringVar(&address, "addr", ":5001", "Address on which you want to run server")
+	flag.StringVar(&address, "addr", "127.0.0.1:5001", "Address on which you want to run server")
 	flag.Parse()
 	conn, err = grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
