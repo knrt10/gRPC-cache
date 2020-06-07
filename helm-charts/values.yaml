@@ -1,0 +1,21 @@
+# Default values for helm-charts.
+
+image:
+  name: grpc-cache
+  repository: knrt10/grpc-cache
+
+ingress:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/backend-protocol: GRPC
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  host: grpc-cache.example.com
+
+namespace: grpc-cache
+
+replicaCount: 1
+
+service:
+  name: grpc-cache
+  port: 5001
+  targetPort: 5001

@@ -18,6 +18,9 @@
     - [Local](#local)
     - [Docker](#docker)
     - [Kubernetes](#kubernetes)
+      - [Host setup](#host-setup)
+      - [Example](#example)
+    - [Helm](#helm)
 - [API](#api)
     - [Add](#add)
     - [Get](#get)
@@ -78,7 +81,12 @@ Usage of ./client-cache:
 
 ## Usage
 
-You can run server in 2 ways either using local setup or docker.
+You can run server locally in 4 ways.
+
+- Using go run
+- Docker
+- Kubernetes
+- Helm
 
 ### Local
 
@@ -100,7 +108,11 @@ You can run server on your kubernetes cluster. All the resources are created on 
 
 - Run this command `make run-k8s-server`
 
-This will create all the required resources needed to run your grpc server. Make sure all resources are ready before running the below command to get your IP for ingress.
+This will create all the required resources needed to run your `grpc server`.
+
+#### Host setup
+
+ Make sure all resources are ready before running the below command to get your IP for ingress.
 
 `kubectl get ingress grpc-cache -o jsonpath='{.status.loadBalancer.ingress[0].ip}'`
 > 192.168.64.3
@@ -133,6 +145,14 @@ grpcurl --insecure grpc-cache.example.com:443 cacheService.CacheService/GetAllIt
 ```
 
 Similarly you can use all the methods as shown in API below
+
+# Helm
+
+Running with Helm is the most easiest way. Just run `make run-helm-server` and it will deploy your application to your kubernetes cluster. This will create all the required resources needed to run your `grpc server`.
+
+After that follow [host setup](#host-setup) to setup your host locally.
+
+Now you can easily test it using [grpcurl](https://github.com/fullstorydev/grpcurl). For API usage you can refer to [example](#example)
 
 ## API
 

@@ -23,4 +23,8 @@ test:
 
 run-k8s-server:
 	- chmod 777 scripts/run-k8-server.sh
-	- scripts/run-k8-server.sh $(hostPort) $(containerPort)
+	- scripts/run-k8-server.sh
+
+run-helm-server:
+	- chmod 777 scripts/run-helm.sh
+	- scripts/run-helm.sh

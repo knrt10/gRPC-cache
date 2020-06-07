@@ -6,9 +6,6 @@
   NAMESPACE_EXIST=$(kubectl get ns grpc-cache -o jsonpath='{.metadata.name}')
   KEY_EXIST=$(kubectl get secrets grpc-cache.example.com -o jsonpath='{.metadata.name}' -n grpc-cache)
   NGINX_CONTROLLER_EXIST=$(kubectl get svc nginx-ingress-grpc-cache-controller -o jsonpath='{.metadata.name}' -n grpc-cache)
-  DEPLOYMENT_EXISTS=$(kubectl get deployment grpc-cache -n grpc-cache -o jsonpath='{.metadata.name}')
-  SERVICE_EXISTS=$(kubectl get svc grpc-cache -n grpc-cache -o jsonpath='{.metadata.name}')
-  INGRESS_EXISTS=$(kubectl get ingress grpc-cache -n grpc-cache -o jsonpath='{.metadata.name}')
 } &> /dev/null
 
 if [ "$NAMESPACE_EXIST" != "grpc-cache" ]; then
@@ -31,16 +28,5 @@ if [ "$KEY_EXIST" != "grpc-cache.example.com" ]; then
 fi
 
 # create resources for k8s
-
-if [ "$DEPLOYMENT_EXISTS" != "grpc-cache" ]; then
-  kubectl create -f ./k8s/deployment.yaml
-fi
-
-if [ "$SERVICE_EXISTS" != "grpc-cache" ]; then
-  kubectl create -f ./k8s/service.yaml
-fi
-
-if [ "$INGRESS_EXISTS" != "grpc-cache" ]; then
-  kubectl create -f ./k8s/ingress.yaml
-fi
+helm install grpc-cache ./helm-charts
 

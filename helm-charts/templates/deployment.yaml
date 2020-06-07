@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      name: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        name: {{ .Chart.Name }}
+      namespace: {{ .Values.namespace }}
+    spec:
+      containers:
+        - name: {{ .Values.image.name | quote}}
+          image: {{ .Values.image.repository | quote}}
+          ports:
+          - containerPort: 5001
+            name: grpc
+
+
