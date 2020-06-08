@@ -28,3 +28,7 @@ run-k8s-server:
 run-helm-server:
 	- chmod 777 scripts/run-helm.sh
 	- scripts/run-helm.sh
+
+run-terraform-server:
+	- chmod 777 scripts/run-terraform.sh
+	- scripts/run-terraform.sh

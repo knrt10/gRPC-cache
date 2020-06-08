@@ -12,15 +12,13 @@
 ## Contents
 
 - [About](#about)
-- [Requirements](#requirements)
-- [Getting Started](#getting-started)
-- [Usage](#usage)
+- [Running Server](#running-server)
     - [Local](#local)
     - [Docker](#docker)
     - [Kubernetes](#kubernetes)
-      - [Host setup](#host-setup)
       - [Example](#example)
     - [Helm](#helm)
+    - [Terraform](#terraform)
 - [API](#api)
     - [Add](#add)
     - [Get](#get)
@@ -29,6 +27,7 @@
     - [DeleteKey](#deletekey)
     - [DeleteAll](#deleteall)
 - [Testing](#testing)
+- [Development](#development)
 - [Example](#example)
 
 ## About
@@ -42,87 +41,58 @@ Go in memory cache using gRPC to generate API. Functionalities include
 - Deleting all keys
 - **Concurrency safe** and on client side calls can be made using goroutines
 
-## Requirements
+## Running server
 
-- [Golang min-version(1.11)](https://golang.org/)
-- make
-- [protobuf](https://github.com/golang/protobuf)
-- [minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/) installed locally
-- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) installed locally
-- [helm](https://helm.sh/) installed locally
-- [grpcurl](https://github.com/fullstorydev/grpcurl) for testing server running on k8s
-
-## Getting Started
-
-Once you've cloned this repo, run these commands in this directory:
-
-```bash
-# Only needed the first time:
-$ make build
-
-# Then run to start server
-$ ./server-cache --help
-
-Usage of ./server-cache:
-  -addr string
-      Address on which you want to run server (default ":5001")
-  -cln int
-      Cleanup interval duration of expired cache is 5 min (default 5)
-  -exp int
-      Default expiration duration of cache is 10 min (default 10)
-
-# To use client
-$ ./client-cache --help
-
-Usage of ./client-cache:
-  -addr string
-      Address on which you want to run server (default ":5001")
-```
-
-## Usage
-
-You can run server locally in 4 ways.
+You can run server locally the following ways
 
 - Using go run
 - Docker
 - Kubernetes
 - Helm
+- Terraform
 
 ### Local
 
-- Start your server `./server-cache` or `make server`
-- `./server-cache -addr=":5001"` to run server on port `5001`
+You can run the server locally but make sure you have the following requirements
+
+- [Golang min-version(1.11)](https://golang.org/)
+- make
+
+Now you can start the server using below commands
+
+```bash
+Start your server `./server-cache` or `make server`
+`./server-cache -addr=":5001"` to run server on port `5001`
+```
 
 ### Docker
+
+Make sure you have following installed
+
+- [Docker](https://www.docker.com/) installed
+
+After the basic requirements are met, you can easily run server from below command.
 
 - Run this command `make docker` // This will build the image
 - Run the server using `make dockerServer`
 
 After running the server, start your client `./client-cache` or `make client` in a different terminal
 
-- `./client-cache -addr=":5001"` is server is running running on port `5001`
+`./client-cache -addr=":5001"` is server is running running on port `5001`
 
 ### Kubernetes
+
+You need to have following things installed on your OS to run server using kubernetes
+
+- [minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/) installed locally
+- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) installed locally
+- [grpcurl](https://github.com/fullstorydev/grpcurl) for testing server running on k8s
 
 You can run server on your kubernetes cluster. All the resources are created on `grpc-cache` namespace. Before running the command below make sure your cluster is up and running.
 
 - Run this command `make run-k8s-server`
 
-This will create all the required resources needed to run your `grpc server`.
-
-#### Host setup
-
- Make sure all resources are ready before running the below command to get your IP for ingress.
-
-`kubectl get ingress grpc-cache -o jsonpath='{.status.loadBalancer.ingress[0].ip}'`
-> 192.168.64.3
-
-You will have a diffrent output. You need this to add to your `/etc/hosts`. Add the above IP to your `/etc/hosts` to map to your ingress host.
-
-`192.168.64.3 grpc-cache.example.com`
-> 192.168.64.3 will be different for you.
-
-Now you can easily test it using [grpcurl](https://github.com/fullstorydev/grpcurl).
+This will create all the required resources needed to run your `grpc server`. You will be asked for passowrd once, to enter ingress address to host mapping automatically to `/etc/hosts`
 
 #### Example
 
@@ -131,7 +101,6 @@ Now you can easily test it using [grpcurl](https://github.com/fullstorydev/grpcu
 grpcurl --insecure grpc-cache.example.com:443 list
 
 # The "describe" verb will print the type of any symbol that the server knows about or that is found in a given protoset file. It also prints a description of that symbol, in the form of snippets of proto source. It won't necessarily be the original source that defined the element, but it will be equivalent.
-
 grpcurl --insecure grpc-cache.example.com:443 list cacheService.CacheService
 
 # To add a key
@@ -146,11 +115,29 @@ grpcurl --insecure grpc-cache.example.com:443 cacheService.CacheService/GetAllIt
 
 Similarly you can use all the methods as shown in API below
 
-# Helm
+### Helm
 
-Running with Helm is the most easiest way. Just run `make run-helm-server` and it will deploy your application to your kubernetes cluster. This will create all the required resources needed to run your `grpc server`.
+You need to have following things installed on your OS to run server using helm
 
-After that follow [host setup](#host-setup) to setup your host locally.
+- [minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/) installed locally
+- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) installed locally
+- [helm](https://helm.sh/) installed locally
+- [grpcurl](https://github.com/fullstorydev/grpcurl) for testing server running on k8s
+
+Just run `make run-helm-server` and it will deploy your application to your kubernetes cluster. This will create all the required resources needed to run your `grpc server`. You will be asked for passowrd once, to enter ingress address to host mapping automatically to `/etc/hosts`
+
+Now you can easily test it using [grpcurl](https://github.com/fullstorydev/grpcurl). For API usage you can refer to [example](#example)
+
+### Terraform
+
+You need to have following things installed on your OS to run server using terraform
+
+- [minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/) installed locally
+- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) installed locally
+- [Terraform](https://www.terraform.io) installed locally
+- [grpcurl](https://github.com/fullstorydev/grpcurl) for testing server running on k8s
+
+Running with Terraform is the most easiest way. Just run `make run-terraform-server` and it will deploy your application to your kubernetes cluster.
 
 Now you can easily test it using [grpcurl](https://github.com/fullstorydev/grpcurl). For API usage you can refer to [example](#example)
 
@@ -231,6 +218,40 @@ go test api/server/* -v -cover -race
 PASS
 coverage: 92.7% of statements
 ok  	command-line-arguments	3.709s	coverage: 92.7% of statements
+```
+
+## Development
+
+You can develop and debug the application locally, but you need to have below softwares installed locally
+
+- [Golang min-version(1.11)](https://golang.org/)
+- make
+- [protobuf](https://github.com/golang/protobuf)
+
+
+Once you've cloned this repo, run these commands in this directory:
+
+```bash
+# Only needed the first time:
+$ make build
+
+# Then run to start server
+$ ./server-cache --help
+
+Usage of ./server-cache:
+  -addr string
+      Address on which you want to run server (default ":5001")
+  -cln int
+      Cleanup interval duration of expired cache is 5 min (default 5)
+  -exp int
+      Default expiration duration of cache is 10 min (default 10)
+
+# To use client
+$ ./client-cache --help
+
+Usage of ./client-cache:
+  -addr string
+      Address on which you want to run server (default ":5001")
 ```
 
 ## Example

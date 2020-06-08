@@ -15,7 +15,3 @@ spec:
           - backend:
               serviceName: {{ .Values.service.name }}
               servicePort: grpc
-  tls:
-  - secretName: {{ .Values.ingress.host }}
-    hosts:
-      - {{ .Values.ingress.host }}

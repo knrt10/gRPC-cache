@@ -2,3 +2,6 @@
 .env
 server-cache
 client-cache
+.terraform/
+terraform.*
+.terraform*

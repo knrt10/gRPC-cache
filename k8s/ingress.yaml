@@ -15,7 +15,3 @@ spec:
           - backend:
               serviceName: grpc-cache
               servicePort: grpc
-  tls:
-  - secretName: grpc-cache.example.com
-    hosts:
-      - grpc-cache.example.com
