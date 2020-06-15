@@ -88,6 +88,10 @@ You need to have following things installed on your OS to run server using kuber
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) installed locally
 - [grpcurl](https://github.com/fullstorydev/grpcurl) for testing server running on k8s
 
+**Important**:- `Make sure your ingress-controller in running`. To enable in minikube
+
+`minikube addons enable ingress`
+
 You can run server on your kubernetes cluster. All the resources are created on `grpc-cache` namespace. Before running the command below make sure your cluster is up and running.
 
 - Run this command `make run-k8s-server`
@@ -124,6 +128,10 @@ You need to have following things installed on your OS to run server using helm
 - [helm](https://helm.sh/) installed locally
 - [grpcurl](https://github.com/fullstorydev/grpcurl) for testing server running on k8s
 
+**Important**:- `Make sure your ingress-controller in running`. To enable in minikube
+
+`minikube addons enable ingress`
+
 Just run `make run-helm-server` and it will deploy your application to your kubernetes cluster. This will create all the required resources needed to run your `grpc server`. You will be asked for passowrd once, to enter ingress address to host mapping automatically to `/etc/hosts`
 
 Now you can easily test it using [grpcurl](https://github.com/fullstorydev/grpcurl). For API usage you can refer to [example](#example)
@@ -136,6 +144,10 @@ You need to have following things installed on your OS to run server using terra
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) installed locally
 - [Terraform](https://www.terraform.io) installed locally
 - [grpcurl](https://github.com/fullstorydev/grpcurl) for testing server running on k8s
+
+**Important**:- `Make sure your ingress-controller in running`. To enable in minikube
+
+`minikube addons enable ingress`
 
 Running with Terraform is the most easiest way. Just run `make run-terraform-server` and it will deploy your application to your kubernetes cluster.
 

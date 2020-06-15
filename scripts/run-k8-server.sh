@@ -1,33 +1,13 @@
 #!/bin/bash
 
-# check namespace if present
-{
-  NAMESPACE_EXIST=$(kubectl get ns grpc-cache -o jsonpath='{.metadata.name}')
-  DEPLOYMENT_EXISTS=$(kubectl get deployment grpc-cache -n grpc-cache -o jsonpath='{.metadata.name}')
-  SERVICE_EXISTS=$(kubectl get svc grpc-cache -n grpc-cache -o jsonpath='{.metadata.name}')
-  INGRESS_EXISTS=$(kubectl get ingress grpc-cache -n grpc-cache -o jsonpath='{.metadata.name}')
-} &> /dev/null
-
-if [ "$NAMESPACE_EXIST" != "grpc-cache" ]; then
-  kubectl create ns grpc-cache
-fi
+# create resources for k8s
+kubectl apply -f ./k8s/namespace.yaml
+kubectl apply -f ./k8s/service.yaml
+kubectl apply -f ./k8s/deployment.yaml
+kubectl apply -f ./k8s/ingress.yaml
 
 # set current context namespace
 kubectl config set-context $(kubectl config current-context) --namespace=grpc-cache
-
-# create resources for k8s
-
-if [ "$DEPLOYMENT_EXISTS" != "grpc-cache" ]; then
-  kubectl create -f ./k8s/deployment.yaml
-fi
-
-if [ "$SERVICE_EXISTS" != "grpc-cache" ]; then
-  kubectl create -f ./k8s/service.yaml
-fi
-
-if [ "$INGRESS_EXISTS" != "grpc-cache" ]; then
-  kubectl create -f ./k8s/ingress.yaml
-fi
 
 HOST_INGRESS=$(kubectl get ingress grpc-cache -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
